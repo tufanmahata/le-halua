@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html xmlns='http://www.w3.org/1999/xhtml' xmlns:b='http://google.com/2005/gml/b' xmlns:data='http://google.com/2005/gml/data' xmlns:expr='http://google.com/2005/gml/expr'>
+<head>
+  <title>LE HALUA</title>
+  <b:skin><![CDATA[
+    /* Hide Blogger Elements */
+    #navbar-iframe, .navbar { display: none !important; height: 0 !important; visibility: hidden !important; }
+    body { margin: 0 !important; padding: 0 !important; }
+  ]]></b:skin>
+</head>
+<body>
+  <div id='loader' style='display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background-color:#ffffff; font-family:sans-serif;'>
+     <style>
+        .spinner {
+           width: 50px;
+           height: 50px;
+           border: 5px solid #f3f3f3;
+           border-top: 5px solid #3498db;
+           border-radius: 50%;
+           animation: spin 1s linear infinite;
+           margin-bottom: 20px;
+        }
+        @keyframes spin {
+           0% { transform: rotate(0deg); }
+           100% { transform: rotate(360deg); }
+        }
+     </style>
+     <div class='spinner'></div>
+     <p style='color:#555; font-size:18px;'>Loading Project...</p>
+  </div>
+
+  <script type='text/javascript'>
+    const projectURL = "https://cdn.jsdelivr.net/gh/USER/REPO@main/index.html";
+
+    fetch(projectURL)
+      .then(res => {
+        if (!res.ok) throw new Error('Network error');
+        return res.text();
+      })
+      .then(html => {
+        document.open();
+        document.write(html);
+        document.close();
+      })
+      .catch(err => {
+        console.error("Error:", err);
+        document.getElementById('loader').innerHTML = "<p style='color:red;'>Failed to load project. Please check your internet </p>";
+      });
+  </script>
+</body>
+
+</html>
