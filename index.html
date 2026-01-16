@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -108,13 +108,11 @@
                     if(records && records.length > 0) {
                         records.forEach(p => {
                             html += `<div class="profile-card">
-                                <b>Name:</b> ${p.name} || 'N/A'<br>
-                                <b>Father:</b> ${p.father_name} || 'N/A'<br>
-                                <b>Mobile:</b> ${p.mobile} || 'N/A'<br>
-                                <b>ID:</b> ${p.id_number} || 'N/A'<br>
-                                <b>Address:</b> ${p.address} || 'N/A'<br>
-                                <b>Alternator Number:</b> ${p.alt_mobile} || 'N/A'<br>
-                                <b>Email:</b> ${p.email} || 'N/A'<br>
+                                <b>Name:</b> ${p.name}<br>
+                                <b>Father:</b> ${p.father_name}<br>
+                                <b>Mobile:</b> ${p.mobile}<br>
+                                <b>ID:</b> ${p.id_number}<br>
+                                <b>Address:</b> ${p.address.replace(/!+/g, ', ')}
                             </div>`;
                         });
                         resDiv.innerHTML = html;
@@ -137,3 +135,4 @@
     </script>
 </body>
 </html>
+           
