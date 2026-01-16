@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Lookup Pro</title>
+    <style>
+        :root { --primary: #2563eb; --bg: #f3f4f6; --card: #ffffff; --text: #1f2937; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { background: var(--card); padding: 25px; border-radius: 15px; width: 100%; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; }
+        h2 { text-align: center; color: var(--primary); margin-top: 0; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; outline: none; font-size: 16px; }
+        button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; transition: 0.2s; }
+        button:disabled { background: #94a3b8; cursor: not-allowed; }
+        .toggle { text-align: center; margin-top: 15px; font-size: 14px; }
+        .link { color: var(--primary); font-weight: bold; cursor: pointer; }
+        #res { width: 100%; max-width: 500px; margin-top: 20px; }
+        .profile-card { background: white; padding: 15px; border-radius: 10px; border-left: 5px solid var(--primary); margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .hidden { display: none; }
+        .spinner { display: inline-block; width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s infinite linear; vertical-align: middle; margin-right: 8px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div id="authSection" class="container">
+        <h2 id="title">Login</h2>
+        <input type="text" id="user" placeholder="Username">
+        <input type="password" id="pass" placeholder="Password">
+        <button onclick="handleAuth()" id="authBtn">Login</button>
+        <div class="toggle">
+            <span id="hint">New user?</span> <span class="link" onclick="toggle()">Register</span>
+        </div>
+    </div>
+
+    <div id="searchSection" class="container hidden">
+        <h2>Search Record</h2>
+        <input type="number" id="numInput" placeholder="Enter Mobile Number">
+        <button onclick="fetchData()" id="searchBtn">Find Data</button>
+        <button onclick="logout()" style="background:#6b7280; margin-top: 20px;">Logout</button>
+    </div>
+
+    <div id="res"></div>
+
+    <script>
+        const API = "https://information-api-l5yv.onrender.com";
+        let isLogin = true;
+
+        function toggle() {
+            isLogin = !isLogin;
+            document.getElementById('title').innerText = isLogin ? "Login" : "Register";
+            document.getElementById('authBtn').innerText = isLogin ? "Login" : "Register";
+            document.getElementById('hint').innerText = isLogin ? "New user?" : "Have an account?";
+            document.querySelector('.link').innerText = isLogin ? "Register" : "Login";
+        }
+
+        async function handleAuth() {
+            const u = document.getElementById('user').value;
+            const p = document.getElementById('pass').value;
+            const btn = document.getElementById('authBtn');
+            if(!u || !p) return alert("Fill all fields");
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Processing...';
+
+            try {
+                const res = await fetch(API + (isLogin ? '/login' : '/register'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: u, password: p })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    if (isLogin) {
+                        localStorage.setItem('token', data.token);
+                        checkAuth();
+                    } else {
+                        alert("Account Created! You can now Login.");
+                        toggle();
+                    }
+                } else { alert(data.error); }
+            } catch (e) { alert("Server Down"); }
+            btn.disabled = false;
+            btn.innerText = isLogin ? "Login" : "Register";
+        }
+
+        async function fetchData() {
+            const num = document.getElementById('numInput').value;
+            const btn = document.getElementById('searchBtn');
+            const resDiv = document.getElementById('res');
+            const token = localStorage.getItem('token');
+            if(!num) return alert("Enter a number");
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Searching...';
+            resDiv.innerHTML = "";
+
+            try {
+                const response = await fetch(API + '/process-number', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ userNumber: num })
+                });
+                const result = await response.json();
+                if(response.ok) {
+                    let html = '';
+                    const records = result.data.result;
+                    if(records && records.length > 0) {
+                        records.forEach(p => {
+                            html += `<div class="profile-card">
+                                <b>Name:</b> ${p.name} || 'N/A'<br>
+                                <b>Father:</b> ${p.father_name} || 'N/A'<br>
+                                <b>Mobile:</b> ${p.mobile} || 'N/A'<br>
+                                <b>ID:</b> ${p.id_number} || 'N/A'<br>
+                                <b>Address:</b> ${p.address} || 'N/A'<br>
+                                <b>Alternator Number:</b> ${p.alt_mobile} || 'N/A'<br>
+                                <b>Email:</b> ${p.email} || 'N/A'<br>
+                            </div>`;
+                        });
+                        resDiv.innerHTML = html;
+                    } else { resDiv.innerHTML = "No record found."; }
+                } else { resDiv.innerHTML = result.error; }
+            } catch (e) { resDiv.innerHTML = "Connection Error"; }
+            btn.disabled = false;
+            btn.innerText = "Find Data";
+        }
+
+        function logout() { localStorage.removeItem('token'); location.reload(); }
+
+        function checkAuth() {
+            if(localStorage.getItem('token')) {
+                document.getElementById('authSection').classList.add('hidden');
+                document.getElementById('searchSection').classList.remove('hidden');
+            }
+        }
+        checkAuth();
+    </script>
+</body>
+</html>
