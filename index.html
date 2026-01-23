@@ -1,10 +1,11 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tufan Mahata</title>
     <style>
-        :root { --priroot: #2563eb; --bg: #f3f4f6; --card: #ffffff; --text: #1f2937; }
+        :root { --primary: #2563eb; --bg: #f3f4f6; --card: #ffffff; --text: #1f2937; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .container { background: var(--card); padding: 25px; border-radius: 15px; width: 100%; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; }
         h2 { text-align: center; color: var(--primary); margin-top: 0; }
@@ -107,11 +108,13 @@
                     if(records && records.length > 0) {
                         records.forEach(p => {
                             html += `<div class="profile-card">
-                                <b>Name:</b> ${p.name}<br>
-                                <b>Father:</b> ${p.father_name}<br>
-                                <b>Mobile:</b> ${p.mobile}<br>
-                                <b>ID:</b> ${p.id_number}<br>
-                                <b>Address:</b> ${p.address.replace(/!+/g, ', ')}
+                                <b>Name:</b> ${p.name} || 'N/A'<br>
+                                <b>Father:</b> ${p.father_name} || 'N/A'<br>
+                                <b>Mobile:</b> ${p.mobile} || 'N/A'<br>
+                                <b>ID:</b> ${p.id_number} || 'N/A'<br>
+                                <b>Address:</b> ${p.address} || 'N/A'<br>
+                                <b>Alternator Number:</b> ${p.alt_mobile} || 'N/A'<br>
+                                <b>Email:</b> ${p.email} || 'N/A'<br>
                             </div>`;
                         });
                         resDiv.innerHTML = html;
@@ -134,4 +137,3 @@
     </script>
 </body>
 </html>
-           
