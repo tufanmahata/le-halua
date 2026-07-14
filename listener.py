@@ -1,15 +1,15 @@
 import socket
 
-# Create a UDP socket
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+# Create a TCP socket
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.bind(('0.0.0.0', 8080))
+sock.listen(1)
 
-# Bind the socket to the port
-server_address = ('0.0.0.0', 8080)
-sock.bind(server_address)
-
-print("Listening for UDP packets on port 8080...")
+print("Listening for TCP connections on port 8080...")
 
 while True:
-    data, address = sock.recvfrom(4096)
-    print(f"Received {len(data)} bytes from {address}/n")
-    print(f"Data: {data}/n/n/n")
+    conn, addr = sock.accept() # Accept the connection
+    print(f"Connected by {addr}")
+    data = conn.recv(4096)
+    print(f"Received data: {data}")
+    conn.close()
